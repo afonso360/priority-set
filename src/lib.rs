@@ -187,8 +187,7 @@ impl<I: PartialEq, const N: usize> PrioritySet<I, N> {
             .max_by_key(|slot| slot.as_ref().unwrap().priority);
 
         if let Some(entry) = slot {
-            let item = mem::replace(entry, None).unwrap();
-            Some(item)
+            mem::replace(entry, None)
         } else {
             None
         }
