@@ -7,8 +7,8 @@ use core::cmp;
 pub struct Priority(pub usize);
 
 impl Priority {
-    const MIN: Priority = Priority(usize::MIN);
-    const MAX: Priority = Priority(usize::MAX);
+    pub const MIN: Priority = Priority(usize::MIN);
+    pub const MAX: Priority = Priority(usize::MAX);
 }
 
 impl From<usize> for Priority {
