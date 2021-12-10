@@ -7,6 +7,8 @@ env:
   CARGO_NET_RETRY: 10
   RUSTUP_MAX_RETRIES: 10
   CI: 1
+  QUICKCHECK_TESTS: 10000
+  QUICKCHECK_MAX_TESTS: 1000000
 
 # Cancel any in-flight jobs for the same PR/branch so there's only one active
 # at a time

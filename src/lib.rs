@@ -1,4 +1,9 @@
 #![cfg_attr(not(test), no_std)]
+
+#[cfg(test)]
+#[macro_use(quickcheck)]
+extern crate quickcheck_macros;
+
 use core::mem;
 use core::cmp;
 
@@ -328,5 +333,43 @@ mod test {
                 item: 11
             }
         ]);
+    }
+}
+
+#[cfg(test)]
+mod quickcheck_tests {
+    use super::*;
+    use std::collections::HashSet;
+
+    #[quickcheck]
+    fn insert_never_crashes(input: Vec<(usize, i32)>) -> bool {
+        let mut p: PrioritySet<i32, 16> = PrioritySet::new();
+        for (priority, item) in input {
+            p.insert(Priority(priority), item);
+        }
+        true
+    }
+
+    #[quickcheck]
+    fn is_a_set(input: Vec<(usize, i32)>) -> bool {
+        let input: Vec<_> = input.into_iter().take(32).collect();
+
+        let mut p: PrioritySet<i32, 32> = PrioritySet::new();
+        for (priority, item) in input.iter() {
+            p.insert(Priority(*priority), *item);
+        }
+
+        let mut set = HashSet::new();
+        for (_, item) in input.iter() {
+            set.insert(*item);
+        }
+
+        let mut p_items: Vec<_> = p.iter().map(|p| p.item).collect();
+        p_items.sort();
+
+        let mut h_items: Vec<_> = set.iter().map(|i| *i).collect();
+        h_items.sort();
+
+        p_items == h_items
     }
 }

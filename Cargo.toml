@@ -11,3 +11,7 @@ keywords = ["no_std", "data-structure", "priority", "no-alloc", "embedded"]
 categories = ["algorithms", "data-structures", "embedded", "memory-management", "no-std"]
 
 [dependencies]
+
+[dev-dependencies]
+quickcheck = "1.0"
+quickcheck_macros = "1.0"
