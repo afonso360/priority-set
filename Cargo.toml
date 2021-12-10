@@ -1,12 +1,13 @@
 [package]
 name = "priority-set"
 version = "0.1.0"
-authors = ["afonsobordado@az8.co"]
+authors = ["Afonso Bordado <afonsobordado@az8.co>"]
 edition = "2018"
 license = "MIT OR Apache-2.0"
 description = "A no_std Priority Set"
 repository = "https://github.com/afonso360/priority-set"
 readme = "README.md"
 keywords = ["no_std", "data-structure", "priority", "no-alloc", "embedded"]
+categories = ["algorithms", "data-structures", "embedded", "memory-management", "no-std"]
 
 [dependencies]

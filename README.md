@@ -1,6 +1,6 @@
-# priority-set
+# `priority-set`
 
-A priority
+A no_std priority set, 
 
 ## License
 

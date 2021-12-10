@@ -24,12 +24,18 @@ impl From<Priority> for usize {
 }
 
 #[derive(Debug, PartialEq)]
-pub struct PrioEntry<I>
-    where
-        I: PartialEq
-{
+pub struct PriorityEntry<I: PartialEq> {
     item: I,
     priority: Priority,
+}
+
+impl<I: PartialEq + Clone> Clone for PriorityEntry<I> {
+    fn clone(&self) -> Self {
+        Self {
+            item: self.item.clone(),
+            priority: self.priority.clone(),
+        }
+    }
 }
 
 /// The result of a [PrioritySet::insert] operation.
@@ -51,18 +57,12 @@ pub enum InsertResult {
 /// It never allocates, instead dropping the lowest priority item when
 /// inserting a new one.
 #[derive(Debug)]
-pub struct PrioritySet<I, const N: usize>
-    where
-        I: PartialEq
-{
-    items: [Option<PrioEntry<I>>; N],
+pub struct PrioritySet<I: PartialEq, const N: usize> {
+    items: [Option<PriorityEntry<I>>; N],
 }
 
 
-impl<I, const N: usize> PrioritySet<I, N>
-    where
-        I: PartialEq + core::fmt::Debug
-{
+impl<I: PartialEq, const N: usize> PrioritySet<I, N> {
     /// Initializes a new empty `PrioritySet` with `N` free slots.
     pub fn new() -> Self {
         Self {
@@ -93,7 +93,7 @@ impl<I, const N: usize> PrioritySet<I, N>
     ///
     /// Returns `true` if the item was inserted, `false` if it was dropped.
     pub fn insert(&mut self, priority: Priority, item: I) -> InsertResult {
-        let new_entry = PrioEntry {
+        let new_entry = PriorityEntry {
             priority,
             item,
         };
@@ -148,7 +148,7 @@ impl<I, const N: usize> PrioritySet<I, N>
     /// Returns an iterator over the entries
     ///
     /// Iteration order is not guaranteed.
-    pub fn iter(&self) -> impl Iterator<Item = &PrioEntry<I>> {
+    pub fn iter(&self) -> impl Iterator<Item = &PriorityEntry<I>> {
         self.items
             .iter()
             .flatten()
@@ -157,20 +157,28 @@ impl<I, const N: usize> PrioritySet<I, N>
     /// Returns a mutable iterator over the entries
     ///
     /// Iteration order is not guaranteed.
-    pub fn iter_mut(&mut self) -> impl Iterator<Item = &mut PrioEntry<I>> {
+    pub fn iter_mut(&mut self) -> impl Iterator<Item = &mut PriorityEntry<I>> {
         self.items
             .iter_mut()
             .flatten()
     }
 
     /// Finds an item entry
-    pub fn entry(&self, item: &I) -> Option<&PrioEntry<I>> {
+    pub fn entry(&self, item: &I) -> Option<&PriorityEntry<I>> {
         self.iter().find(|e| e.item == *item)
     }
 
     /// Returns a mutable entry to an item
-    pub fn entry_mut(&mut self, item: &I) -> Option<&mut PrioEntry<I>> {
+    pub fn entry_mut(&mut self, item: &I) -> Option<&mut PriorityEntry<I>> {
         self.iter_mut().find(|e| e.item == *item)
+    }
+}
+
+impl<I: PartialEq + Clone, const N: usize> Clone for PrioritySet<I, N> {
+    fn clone(&self) -> Self {
+        PrioritySet {
+            items: self.items.clone()
+        }
     }
 }
 
@@ -279,11 +287,11 @@ mod test {
         values.sort_by_key(|i| i.priority);
 
         assert_eq!(values, [
-            &PrioEntry {
+            &PriorityEntry {
                 priority: Priority(10),
                 item: 10
             },
-            &PrioEntry {
+            &PriorityEntry {
                 priority: Priority(20),
                 item: 11
             }
