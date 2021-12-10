@@ -172,6 +172,27 @@ impl<I: PartialEq, const N: usize> PrioritySet<I, N> {
     pub fn entry_mut(&mut self, item: &I) -> Option<&mut PriorityEntry<I>> {
         self.iter_mut().find(|e| e.item == *item)
     }
+
+    /// Pops the highest priority item from the set
+    pub fn pop(&mut self) -> Option<I> {
+        self.pop_entry()
+            .map(|entry| entry.item)
+    }
+
+    /// Pops the highest priority item entry from the set
+    pub fn pop_entry(&mut self) -> Option<PriorityEntry<I>> {
+        let slot = self.items
+            .iter_mut()
+            .filter(|entry| entry.is_some())
+            .max_by_key(|slot| slot.as_ref().unwrap().priority);
+
+        if let Some(entry) = slot {
+            let item = mem::replace(entry, None).unwrap();
+            Some(item)
+        } else {
+            None
+        }
+    }
 }
 
 impl<I: PartialEq + Clone, const N: usize> Clone for PrioritySet<I, N> {
@@ -248,7 +269,6 @@ mod test {
         assert!(p.entry(&12).is_some());
     }
 
-
     #[test]
     fn insert_replaces_the_lowest_priority_item() {
         let mut p: PrioritySet<i32, 3> = PrioritySet::new();
@@ -264,7 +284,6 @@ mod test {
         assert!(p.entry(&13).is_some());
     }
 
-
     #[test]
     fn insert_updates_the_priority_of_an_item_if_it_already_exists() {
         let mut p: PrioritySet<i32, 3> = PrioritySet::new();
@@ -274,6 +293,20 @@ mod test {
         assert_eq!(p.insert(Priority(5), 10), InsertResult::Dropped);
 
         assert_eq!(p.priority(&10), Some(Priority(20)));
+    }
+
+    #[test]
+    fn pop_gets_the_highest_priority_item() {
+        let mut p: PrioritySet<i32, 3> = PrioritySet::new();
+
+        p.insert(Priority(10), 10);
+        p.insert(Priority(20), 20);
+        p.insert(Priority(15), 30);
+
+        assert_eq!(p.pop(), Some(20));
+        assert_eq!(p.pop(), Some(30));
+        assert_eq!(p.pop(), Some(10));
+        assert_eq!(p.len(), 0);
     }
 
     #[test]
