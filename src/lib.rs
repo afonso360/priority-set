@@ -30,8 +30,8 @@ impl From<Priority> for usize {
 
 #[derive(Debug, PartialEq)]
 pub struct PriorityEntry<I: PartialEq> {
-    item: I,
-    priority: Priority,
+    pub item: I,
+    pub priority: Priority,
 }
 
 impl<I: PartialEq + Clone> Clone for PriorityEntry<I> {
@@ -371,5 +371,32 @@ mod quickcheck_tests {
         h_items.sort();
 
         p_items == h_items
+    }
+
+
+    #[quickcheck]
+    fn pop_sorts_by_priority(input: Vec<(usize, i32)>) -> bool {
+        let input: Vec<_> = input.into_iter().take(32).collect();
+
+        let mut p: PrioritySet<i32, 32> = PrioritySet::new();
+        for (priority, item) in input.iter() {
+            p.insert(Priority(*priority), *item);
+        }
+
+        let mut prev_priority = Priority::MAX;
+        loop {
+            match p.pop_entry() {
+                Some(popped) => {
+                    if popped.priority > prev_priority {
+                        return false;
+                    }
+
+                    prev_priority = popped.priority;
+                },
+                None => {
+                    return true;
+                }
+            };
+        }
     }
 }
