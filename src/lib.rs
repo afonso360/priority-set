@@ -1,3 +1,34 @@
+//! A fixed size priority set suitable for no_std use.
+//!
+//! Example:
+//!
+//! ```rust
+//! # use priority_set::*;
+//!
+//! #[derive(PartialEq, Debug)]
+//! enum Command {
+//!     QueryServerA,
+//!     QueryServerB,
+//! }
+//!
+//! fn main() {
+//!     // Create a priority set with 10 slots
+//!     let mut p: PrioritySet<Command, 10> = PrioritySet::new();
+//!
+//!     // Insert two items
+//!     p.insert(Priority(10), Command::QueryServerA);
+//!     p.insert(Priority(20), Command::QueryServerB);
+//!     p.insert(Priority(30), Command::QueryServerA);
+//!
+//!     // We inserted a duplicate command, so its priority was updated, but no new item was added
+//!     assert_eq!(p.len(), 2);
+//!
+//!     // Pops the highest priority item, which is QueryServerA with Priority(30)
+//!     assert_eq!(p.pop(), Some(Command::QueryServerA));
+//!     assert_eq!(p.pop(), Some(Command::QueryServerB));
+//!     assert_eq!(p.pop(), None);
+//! }
+
 #![cfg_attr(not(test), no_std)]
 
 #[cfg(test)]
